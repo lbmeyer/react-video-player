@@ -78,10 +78,34 @@ const VideoPlayer = props => {
     props.history.push({
       pathname: `${state.videos[nextVideo].id}`,
       autoplay: false
-    })
+    });
   };
 
-  const progressCallback = () => {};
+  // Apply played: true if video has played for more than 10 secs
+  const progressCallback = e => {
+    if (e.playedSeconds > 10 && e.playedSeconds < 11) {
+      setState(prevState => ({
+        ...prevState,
+        videos: state.videos.map(el => {
+          return el.id === state.activeVideo.id
+          ? { ...el, played: true } // clone video el then set played property to true
+          : el
+        })
+      }))
+
+      // Method #2 -->
+      // const videos = [...state.videos];
+      // const playedVideo = videos.find(
+      //   video => video.id === state.activeVideo.id
+      // );
+      
+      // playedVideo.played = true;
+
+      // setState(prevState => ({
+      //   ...prevState, videos
+      // }));
+    }
+  };
 
   return (
     <ThemeProvider theme={state.nightMode ? theme : themeLight}>

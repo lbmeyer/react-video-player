@@ -29,13 +29,21 @@ const VideoPlayer = props => {
   // const videos = JSON.parse(document.querySelector('[name="videos"]').value);
   const videos = data;
 
+  // Retrieve state from LS
+  const savedState = JSON.parse(localStorage.getItem(`${videos.playlistId}`));
+
   const [state, setState] = useState({
-    videos: videos.playlist,
-    activeVideo: videos.playlist[0],
-    nightMode: true,
-    playlistId: videos.playlistId,
+    videos: savedState ? savedState.videos : videos.playlist,
+    activeVideo: savedState ? savedState.activeVideo : videos.playlist[0],
+    nightMode: savedState ? savedState.nightMode : true,
+    playlistId: savedState ? savedState.playlistId : videos.playlistId,
     autoplay: false
   });
+
+  // Set state to LS on state change
+  useEffect(() => {
+    localStorage.setItem(`${state.playlistId}`, JSON.stringify({ ...state }));
+  }, [state]);
 
   useEffect(() => {
     const videoId = props.match.params.activeVideo;
@@ -88,17 +96,17 @@ const VideoPlayer = props => {
         ...prevState,
         videos: state.videos.map(el => {
           return el.id === state.activeVideo.id
-          ? { ...el, played: true } // clone video el then set played property to true
-          : el
+            ? { ...el, played: true } // clone video el then set played property to true
+            : el;
         })
-      }))
+      }));
 
       // Method #2 -->
       // const videos = [...state.videos];
       // const playedVideo = videos.find(
       //   video => video.id === state.activeVideo.id
       // );
-      
+
       // playedVideo.played = true;
 
       // setState(prevState => ({

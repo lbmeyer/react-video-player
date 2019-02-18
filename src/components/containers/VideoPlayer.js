@@ -58,19 +58,38 @@ const VideoPlayer = props => {
     }
   }, [props.match.params.activeVideo]);
 
-  const nightModeCallback = () => {};
+  const nightModeCallback = () => {
+    setState(prevState => ({
+      ...prevState,
+      nightMode: !prevState.nightMode
+    }));
+  };
 
-  const endCallback = () => {};
+  const endCallback = () => {
+    const videoId = props.match.params.activeVideo;
+    const currentVideoIndex = state.videos.findIndex(
+      video => video.id === videoId
+    );
+
+    // if current index is at the end, start at beginning [0]. Else play next video
+    const nextVideo =
+      currentVideoIndex === state.videos.length - 1 ? 0 : currentVideoIndex + 1;
+
+    props.history.push({
+      pathname: `${state.videos[nextVideo].id}`,
+      autoplay: false
+    })
+  };
 
   const progressCallback = () => {};
 
   return (
     <ThemeProvider theme={state.nightMode ? theme : themeLight}>
-      {state.video !== null ? (
+      {state.videos !== null ? (
         <StyledVideoPlayer>
           <Video
             active={state.activeVideo}
-            autoPlay={state.autoplay}
+            autoplay={state.autoplay}
             endCallback={endCallback}
             progressCallback={progressCallback}
           />
